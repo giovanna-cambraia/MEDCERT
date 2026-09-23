@@ -1,0 +1,16 @@
+project Example_Module is
+
+   for Source_Dirs use ("include", "source");
+   for Object_Dir use "obj";
+
+   package Naming is
+      for Spec_Suffix ("Ada") use ".ads";
+      for Body_Suffix ("Ada") use ".adb";
+   end Naming;
+
+   package Compiler is
+      for Default_Switches ("Ada") use
+        ("-gnatwa", "-gnata", "-gnat2012");
+   end Compiler;
+
+end Example_Module;

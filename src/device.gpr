@@ -1,0 +1,7 @@
+aggregate project Device is
+
+   for Project_Files use
+     ("device/example_module/example_module.gpr");
+   -- Add one line per new device module.
+
+end Device;

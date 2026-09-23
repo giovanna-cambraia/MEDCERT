@@ -1,0 +1,20 @@
+project Example_Module is
+
+   for Languages use ("C");
+   for Source_Dirs use ("source");
+
+   Include_Dir := "include";
+   for Object_Dir use "obj";
+   for Source_Files use (); -- placeholder: populate as files are added
+
+   package Naming is
+      for Spec_Suffix ("C") use ".h";
+      for Body_Suffix ("C") use ".c";
+   end Naming;
+
+   package Compiler is
+      for Default_Switches ("C") use
+        ("-Wall", "-Wextra", "-std=c11", "-pedantic", "-I" & Example_Module.Include_Dir);
+   end Compiler;
+
+end Example_Module;

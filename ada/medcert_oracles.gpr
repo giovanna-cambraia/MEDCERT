@@ -1,0 +1,9 @@
+aggregate project Medcert_Oracles is
+
+   for Project_Files use
+     ("src/example_module/example_module.gpr");
+   -- Add one line per new host-side module (reference model, oracle,
+   -- risk-analysis tool, SPARK-proved logic). Every module gets its own
+   -- .gpr so it can be built/tested in isolation before wiring in here.
+
+end Medcert_Oracles;
