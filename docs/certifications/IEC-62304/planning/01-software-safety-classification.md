@@ -1,6 +1,10 @@
 # Software Safety Classification — IEC 62304 §4.3
 
-> **Status: initial classification.** Based on
+> **Status: classification decision updated — Option A (independent
+> safety controller) chosen in
+> [[../../IEC-60601-1-4/pems_architecture/00-pems-architecture.md]]. See
+> "Update" section below for what that does and does not change yet.**
+> Based on
 > [[../../ISO-14971/hazard_analysis/00-hazard-analysis.md]]. Per §4.3,
 > classification is decided per software item/segment, using the worst
 > credible severity that item could contribute to *if it fails*, before
@@ -32,29 +36,36 @@ into items — see below.
 
 ## Why not B, and what would change that
 
-The open question from the hazard analysis — whether a
-**hardware-independent max-dose limiter** exists on the pump, separate
-from the dosing algorithm — is exactly the thing that determines this.
+The open question from the hazard analysis has been resolved
+architecturally: **Option A (independent safety controller MCU) is
+chosen.** That satisfies the independence bar in principle — but §4.3
+credit for an independent risk control requires the control to actually
+*exist and be verified*, not just be architecturally decided. See
+"Update" section below for what that means right now versus once the
+safety controller is built.
 
-- **If it exists and is independent** (own circuit/firmware, not
-  reachable by a bug in the dosing algorithm): the *dosing algorithm's*
-  contribution to HAZ-004/007/009 is capped by that limiter, and the
-  algorithm item's class could potentially be argued down to **B** —
-  the limiter itself then inherits the **C** classification, since it's
-  now the thing standing between a software error and death.
-- **If it does not exist, or shares any code/hardware path with the
-  dosing algorithm**: no credit is available, the algorithm stays
-  **C**, full stop.
+- **Once built and verified**: the *dosing algorithm's* contribution to
+  HAZ-004/007/009 is capped by the safety controller, and the algorithm
+  item's class can be argued down to **B** — the safety-controller
+  firmware itself then inherits **C**, since it's now the thing standing
+  between a software error and death.
+- **Until then**: no credit is available yet. The dosing algorithm stays
+  **C** as the honest current state, same discipline as the FMEA
+  worksheet's `residual_risk: null` rows — a chosen architecture is not
+  a built-and-verified one.
 
-This is a real design decision, not a paperwork one — building that
-limiter is a hardware/firmware scoping question for the pump module, not
-something resolved by writing more docs. Flagging it here as the
-**highest-leverage open item** in the whole project: it determines how
-much of the codebase needs Class C rigor (full IEC 62304 §5–§9: detailed
-design docs, unit AND integration testing with coverage, formal
-problem-resolution process) versus Class B (lighter documentation,
-integration+system test focus, problem-resolution still required but
-less formal).
+## Update — Option A chosen: current state vs. eventual state
+
+| Item | Class today (safety controller not yet built) | Class once safety controller is built + verified |
+|------|--------------------------------------------------|------------------------------------------------------|
+| Dosing algorithm | **C** (no credit yet) | Candidate **B** |
+| Safety controller firmware (new item, doesn't exist yet in per-item table below) | N/A — not built | **C** |
+| Pump command interface | **C** | Likely still **C** — it's downstream of the limiter, still needs to correctly apply the clamped command |
+| CGM signal acquisition | **C** | Unaffected by this decision — HAZ-001/002/003 aren't addressed by a dose limiter |
+
+Nothing in the per-item table below is changed by this yet — it still
+lists the pre-decision state, since the safety controller isn't a real
+item in the codebase until it's designed. Update that table when it is.
 
 ## Per-item breakdown (preliminary — items not yet defined in code)
 
@@ -85,9 +96,11 @@ Per IEC 62304 for Class C items:
 
 ## Open questions
 
-- Hardware max-dose limiter: exists / doesn't / TBD — **the** decision
-  that determines whether this whole project runs at uniform Class C or
-  splits B/C by item.
+- Whether the dosing algorithm's classification actually drops to B once
+  the safety controller exists, or whether review at that time finds a
+  residual path that keeps it at C (e.g. if the pump command interface
+  turns out not to be fully downstream of the limiter) — don't assume B
+  is guaranteed just because the architecture was chosen.
 - Once items are named for real, each needs this same worst-case-harm
   walk-through individually, not just inherited from this preliminary
   table.
