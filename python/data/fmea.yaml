@@ -1,0 +1,140 @@
+# FMEA worksheet rows (ISO 14971); rendered to docs/certifications/ISO-14971/fmea/fmea-worksheet.md by
+# python/src/medcert_tools/fmea.py (via tools/scripts/report.sh)
+
+# severity/probability use the S1-S5 / P1-P5 scales from docs/certifications/ISO-14971/risk_management_plan/01-risk-management-plan.md
+# residual_risk is the A/ALARP/U verdict from that plan's acceptability matrix, evaluated AFTER the listed risk_controls are 
+# assumed in plac, where a control doesn't exist yet (design not done), residual_risk is
+# left null; this worksheet is not allowed to claim a risk is controlled before the control is real
+
+fmea_rows:
+  - id: FMEA-001
+    module: signal_acquisition
+    function: "Acquire glucose reading from CGM sensor"
+    failure_mode: "Sensor value drifts out of calibration, reads persistently low"
+    effect: "Algorithm believes glucose is lower than actual, over-doses"
+    severity: S4
+    cause: "Sensor calibration drift, aging, or manufacturing tolerance"
+    probability: P3
+    detection: "None yet -- would require cross-check against expected physiological rate of change or a redundant sensor"
+    risk_controls: []
+    residual_risk: null  # TBD -- currently no detection/control
+
+  - id: FMEA-002
+    module: signal_acquisition
+    function: "Acquire glucose reading from CGM sensor"
+    failure_mode: "Sensor signal dropout (disconnection, radio loss)"
+    effect: "Algorithm has no fresh data; risk of dosing on stale value"
+    severity: S3
+    cause: "Physical disconnection, radio interference, battery depletion on sensor side"
+    probability: P3
+    detection: "Signal-present heartbeat / timeout (SR-001, not yet built)"
+    risk_controls: ["SR-001: dropout detection + safe-state transition"]
+    residual_risk: null  # TBD -- ALARP once SR-001 exists and is verified, not before
+
+  - id: FMEA-003
+    module: signal_acquisition
+    function: "Acquire glucose reading from CGM sensor"
+    failure_mode: "Sensor value spikes falsely high (transient noise/EMI)"
+    effect: "Algorithm over-doses believing glucose is high"
+    severity: S4
+    cause: "Electromagnetic interference, sensor noise"
+    probability: P2
+    detection: "Plausibility bound / rate-of-change check (SR-002, not yet built)"
+    risk_controls: ["SR-002: reject physiologically implausible readings"]
+    residual_risk: null  # TBD -- SR-002 not implemented yet
+
+  - id: FMEA-004
+    module: dosing_algorithm
+    function: "Compute insulin dose from glucose reading + trend"
+    failure_mode: "Logic error / edge case yields incorrect dose"
+    effect: "Wrong insulin amount commanded"
+    severity: S5
+    cause: "Software defect in control logic"
+    probability: P2
+    detection: "Output plausibility self-check (SR-004, not yet built); SPARK proof on Ada reference model reduces likelihood but doesn't detect at runtime"
+    risk_controls: ["SR-004: self-check before emitting dose", "SR-006: independent max-dose limiter (architecture TBD, see PEMS architecture Option A/B)"]
+    residual_risk: null  # TBD -- depends entirely on Option A vs B decision
+
+  - id: FMEA-005
+    module: dosing_algorithm
+    function: "Compute insulin dose from glucose reading + trend"
+    failure_mode: "Algorithm fails to react to rapid glucose drop (e.g. exercise)"
+    effect: "Delayed correction, hypoglycemia progresses"
+    severity: S4
+    cause: "Control loop cycle time too slow, or trend detection insufficient"
+    probability: P3
+    detection: "None at runtime -- this is a design/tuning gap, not a fault to detect"
+    risk_controls: ["SR-005: bounded re-evaluation cycle time"]
+    residual_risk: null  # TBD -- cycle time not yet chosen
+
+  - id: FMEA-006
+    module: dosing_algorithm
+    function: "Maintain algorithm state (glucose history, prior doses)"
+    failure_mode: "State corruption (memory fault, race condition)"
+    effect: "Unpredictable dosing behavior"
+    severity: S5
+    cause: "Software/hardware fault (race condition, memory fault, stack overflow)"
+    probability: P2
+    detection: "State-integrity check (SR-004); watchdog pattern reused from do178c-demo BTC liveness monitor"
+    risk_controls: ["SR-004: state-integrity self-check", "watchdog-style liveness monitor (pattern from do178c-demo)"]
+    residual_risk: null  # TBD -- neither control implemented yet
+
+  - id: FMEA-007
+    module: pump_actuator
+    function: "Deliver commanded insulin dose"
+    failure_mode: "Pump over-delivers (mechanical or command fault)"
+    effect: "Excess insulin regardless of whether the algorithm's output was correct"
+    severity: S4
+    cause: "Actuator fault, command misinterpretation"
+    probability: P2
+    detection: "Independent max-dose limiter (architecture TBD)"
+    risk_controls: ["SR-006: independent max-dose limiter"]
+    residual_risk: null  # TBD -- same open architecture question as FMEA-004
+
+  - id: FMEA-008
+    module: pump_actuator
+    function: "Deliver commanded insulin dose"
+    failure_mode: "Pump under-delivers / occludes"
+    effect: "Insufficient insulin, hyperglycemia/DKA over time"
+    severity: S3
+    cause: "Mechanical occlusion, air-in-line, actuator wear"
+    probability: P3
+    detection: "Occlusion detection not yet designed -- known hard problem in real pump hardware"
+    risk_controls: []
+    residual_risk: null  # TBD -- no control designed yet
+
+  - id: FMEA-009
+    module: pump_actuator
+    function: "Deliver commanded insulin dose"
+    failure_mode: "Pump acts on stale or duplicate dose command"
+    effect: "Double-dosing from a single algorithm decision"
+    severity: S4
+    cause: "Command not idempotent, no freshness check at delivery interface"
+    probability: P2
+    detection: "Command freshness/idempotency check (SR-007, not yet built)"
+    risk_controls: ["SR-007: reject stale/duplicate commands"]
+    residual_risk: null  # TBD -- SR-007 not implemented yet
+
+  - id: FMEA-010
+    module: power_alarm
+    function: "Maintain alarm availability"
+    failure_mode: "Main system power loss disables alarm along with everything else"
+    effect: "No hypo/hyperglycemia alarm when patient may most need it (system already failed)"
+    severity: S4
+    cause: "Shared power domain between main controller and alarm"
+    probability: P3
+    detection: "N/A -- this is an absence-of-control finding, not a detectable fault"
+    risk_controls: ["SR-009: alarm survives main power loss", "SR-010: power loss itself triggers alarm"]
+    residual_risk: null  # TBD -- depends on PEMS architecture Option A/B (independent power domain)
+
+  - id: FMEA-011
+    module: process
+    function: "Deploy software/configuration changes"
+    failure_mode: "Change introduces a regression not caught before deployment"
+    effect: "Reintroduces any of the above failure modes freshly"
+    severity: S5
+    cause: "Incomplete re-verification after change"
+    probability: P2
+    detection: "Config management + revalidation process (SR-011, not yet built)"
+    risk_controls: ["SR-011: re-run affected verification evidence before deploy"]
+    residual_risk: null  # TBD -- process not yet written (docs/certifications/IEC-62304/config_management/)
