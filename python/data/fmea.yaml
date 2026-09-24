@@ -18,7 +18,7 @@ fmea_rows:
     detection: "None yet -- would require cross-check against expected physiological rate of change or a redundant sensor"
     risk_controls: []
     residual_risk: null  # TBD -- currently no detection/control
-
+ 
   - id: FMEA-002
     module: signal_acquisition
     function: "Acquire glucose reading from CGM sensor"
@@ -30,7 +30,7 @@ fmea_rows:
     detection: "Signal-present heartbeat / timeout (SR-001, not yet built)"
     risk_controls: ["SR-001: dropout detection + safe-state transition"]
     residual_risk: null  # TBD -- ALARP once SR-001 exists and is verified, not before
-
+ 
   - id: FMEA-003
     module: signal_acquisition
     function: "Acquire glucose reading from CGM sensor"
@@ -42,7 +42,7 @@ fmea_rows:
     detection: "Plausibility bound / rate-of-change check (SR-002, not yet built)"
     risk_controls: ["SR-002: reject physiologically implausible readings"]
     residual_risk: null  # TBD -- SR-002 not implemented yet
-
+ 
   - id: FMEA-004
     module: dosing_algorithm
     function: "Compute insulin dose from glucose reading + trend"
@@ -52,9 +52,9 @@ fmea_rows:
     cause: "Software defect in control logic"
     probability: P2
     detection: "Output plausibility self-check (SR-004, not yet built); SPARK proof on Ada reference model reduces likelihood but doesn't detect at runtime"
-    risk_controls: ["SR-004: self-check before emitting dose", "SR-006: independent max-dose limiter (architecture TBD, see PEMS architecture Option A/B)"]
-    residual_risk: null  # TBD -- depends entirely on Option A vs B decision
-
+    risk_controls: ["SR-004: self-check before emitting dose", "SR-006: independent max-dose limiter (PEMS architecture Option A chosen, safety controller not yet built/verified)"]
+    residual_risk: null  # TBD -- architecture chosen (Option A), no classification/risk credit until safety controller is built and verified
+ 
   - id: FMEA-005
     module: dosing_algorithm
     function: "Compute insulin dose from glucose reading + trend"
@@ -66,7 +66,7 @@ fmea_rows:
     detection: "None at runtime -- this is a design/tuning gap, not a fault to detect"
     risk_controls: ["SR-005: bounded re-evaluation cycle time"]
     residual_risk: null  # TBD -- cycle time not yet chosen
-
+ 
   - id: FMEA-006
     module: dosing_algorithm
     function: "Maintain algorithm state (glucose history, prior doses)"
@@ -78,7 +78,7 @@ fmea_rows:
     detection: "State-integrity check (SR-004); watchdog pattern reused from do178c-demo BTC liveness monitor"
     risk_controls: ["SR-004: state-integrity self-check", "watchdog-style liveness monitor (pattern from do178c-demo)"]
     residual_risk: null  # TBD -- neither control implemented yet
-
+ 
   - id: FMEA-007
     module: pump_actuator
     function: "Deliver commanded insulin dose"
@@ -87,10 +87,10 @@ fmea_rows:
     severity: S4
     cause: "Actuator fault, command misinterpretation"
     probability: P2
-    detection: "Independent max-dose limiter (architecture TBD)"
+    detection: "Independent max-dose limiter (PEMS architecture Option A chosen, not yet built/verified)"
     risk_controls: ["SR-006: independent max-dose limiter"]
-    residual_risk: null  # TBD -- same open architecture question as FMEA-004
-
+    residual_risk: null  # TBD -- same as FMEA-004, no credit until safety controller exists
+ 
   - id: FMEA-008
     module: pump_actuator
     function: "Deliver commanded insulin dose"
@@ -102,7 +102,7 @@ fmea_rows:
     detection: "Occlusion detection not yet designed -- known hard problem in real pump hardware"
     risk_controls: []
     residual_risk: null  # TBD -- no control designed yet
-
+ 
   - id: FMEA-009
     module: pump_actuator
     function: "Deliver commanded insulin dose"
@@ -114,7 +114,7 @@ fmea_rows:
     detection: "Command freshness/idempotency check (SR-007, not yet built)"
     risk_controls: ["SR-007: reject stale/duplicate commands"]
     residual_risk: null  # TBD -- SR-007 not implemented yet
-
+ 
   - id: FMEA-010
     module: power_alarm
     function: "Maintain alarm availability"
@@ -125,8 +125,8 @@ fmea_rows:
     probability: P3
     detection: "N/A -- this is an absence-of-control finding, not a detectable fault"
     risk_controls: ["SR-009: alarm survives main power loss", "SR-010: power loss itself triggers alarm"]
-    residual_risk: null  # TBD -- depends on PEMS architecture Option A/B (independent power domain)
-
+    residual_risk: null  # TBD -- PEMS architecture Option A chosen (independent power domain), safety controller not yet built/verified
+ 
   - id: FMEA-011
     module: process
     function: "Deploy software/configuration changes"
@@ -138,3 +138,15 @@ fmea_rows:
     detection: "Config management + revalidation process (SR-011, not yet built)"
     risk_controls: ["SR-011: re-run affected verification evidence before deploy"]
     residual_risk: null  # TBD -- process not yet written (docs/certifications/IEC-62304/config_management/)
+ 
+  - id: FMEA-012
+    module: safety_controller_interface
+    function: "Communicate dose command + fault signal between main controller and safety controller"
+    failure_mode: "Interface message corrupted, dropped, or spoofed"
+    effect: "Fail-safe direction: legitimate dose blocked (missed/delayed dose). Fail-unsafe direction: bad dose passed through uncaught."
+    severity: S4  # worst-case (fail-unsafe); fail-safe direction alone would be S3 -- see HAZ-012 note on pinning this once interface is designed
+    cause: "New interface introduced by choosing PEMS architecture Option A"
+    probability: P2
+    detection: "Interface should be designed to default fail-safe (block dose on any anomaly) -- not yet designed"
+    risk_controls: []
+    residual_risk: null  # TBD -- interface not designed yet; this row exists because Option A was chosen, same discipline as the others

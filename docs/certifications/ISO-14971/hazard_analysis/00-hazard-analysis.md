@@ -38,8 +38,9 @@ Organized by the three functional stages from
 
 | ID    | Hazard                              | Hazardous situation                                              | Harm                                  | Sev | Prob | Notes |
 |-------|--------------------------------------|--------------------------------------------------------------------|-----------------------------------------|-----|------|-------|
-| HAZ-010 | Loss of power / battery depletion mid-operation | No insulin delivery, no monitoring, no alarm if alarm is also unpowered | Hyperglycemia over time; missed hypoglycemia detection | S3/S4 | P3 | Alarm power path must be independent or battery-backed |
+| HAZ-010 | Loss of power / battery depletion mid-operation | No insulin delivery, no monitoring, no alarm if alarm is also unpowered | Hyperglycemia over time; missed hypoglycemia detection | S3/S4 | P3 | Resolved by PEMS architecture Option A (independent power domain for safety controller) — see [[../../IEC-60601-1-4/pems_architecture/00-pems-architecture.md]]; not yet built/verified |
 | HAZ-011 | Software update / config change introduces regression | Any of the above, freshly | Varies | Varies | This is a IEC 62304 config-management + revalidation concern, not just initial design |
+| HAZ-012 | Main controller ↔ safety controller interface fails (message corrupted, dropped, or spoofed) | Safety controller either blocks a legitimate dose (fail-safe, less severe) or fails to catch a bad one (fail-unsafe, severe) | Depends on failure direction: fail-safe → delayed/missed dose (S3); fail-unsafe → same as HAZ-004/007/009 (S4/S5) | P2 | New hazard, introduced by choosing PEMS architecture Option A — didn't exist when the safety controller didn't exist. Interface should be designed so failure defaults fail-safe (e.g. safety controller blocks dose on any communication anomaly, never blindly passes it through) |
 
 ## Reading this against the classification question
 
@@ -48,20 +49,27 @@ and how severe is the resulting harm if it does?** Looking at the table —
 HAZ-004, HAZ-005, HAZ-006 (decide-stage) and the software-adjacent parts
 of HAZ-001/002/003 (monitor-stage interpretation logic) all show software
 directly in the causal chain, at S4/S5. That's a strong signal this
-project is **not** going to land at Class A. Whether it's B or C depends
-on whether a non-software risk control exists that independently prevents
-the S4/S5 outcome (e.g. a hardware max-dose limiter on the pump
-independent of software, which would pull HAZ-007/HAZ-009 down). That's
-the next real decision point, but it's for the classification doc, not
-this one.
+project is **not** going to land at Class A. The B-vs-C question was
+resolved architecturally by choosing PEMS Option A (independent safety
+controller) — see
+[[../../IEC-60601-1-4/pems_architecture/00-pems-architecture.md]] — but
+classification credit doesn't apply until that controller is actually
+built and verified; see
+[[../../IEC-62304/planning/01-software-safety-classification.md]] for
+the current-state-vs-eventual-state breakdown.
 
 ## Open questions
 
-- Severity ranges given as "S4/S5" need to be pinned to one value once
-  a specific worst-case scenario is chosen per hazard.
-- Whether a hardware-independent max-dose limiter exists is unknown —
-  this single design decision swings the classification call.
+- Severity ranges given as "S4/S5" (and HAZ-012's split by failure
+  direction) need to be pinned to one worst-case value once specific
+  scenarios are designed out.
+- HAZ-012's fail-safe design intent (block on any comms anomaly) needs
+  to become a real requirement once the safety controller's interface is
+  designed — not yet in `python/data/requirements.yaml`.
+- FMEA-008 (pump occlusion/under-delivery) has no risk control identified
+  at all in the FMEA worksheet, independent of the Option A/B decision —
+  flagged there as needing its own design attention.
 - This list has not been checked for completeness against a systematic
-  method (e.g. FMEA per component, fault tree) — it's a first pass by
-  inspection. The FMEA worksheet (next artifact) is where that
-  systematic pass happens.
+  method beyond the one FMEA pass already done — expect it to keep
+  growing as design gets concrete (HAZ-012 itself is an example: it
+  didn't exist until an architecture decision created it).
