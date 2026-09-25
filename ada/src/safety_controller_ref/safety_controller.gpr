@@ -1,4 +1,4 @@
-project Example_Module is
+project Safety_Controller is
 
    for Source_Dirs use ("include", "source");
    for Object_Dir use "obj";
@@ -13,4 +13,4 @@ project Example_Module is
         ("-gnatwa", "-gnata", "-gnat2012");
    end Compiler;
 
-end Example_Module;
+end Safety_Controller;
