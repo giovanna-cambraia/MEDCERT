@@ -1,6 +1,8 @@
 name = "medcert_oracles"
-description = "Host-side reference models, oracles, and risk-analysis tooling for the IEC 62304 / IEC 60601-1 / IEC 60601-1-4 / ISO 14971 project. Isolated crate — do not add `with` clauses or GPR_PROJECT_PATH entries pointing outside this ada/ directory."
+description = "Host-side reference models and risk oracles for MEDCERT"
 version = "0.1.0-dev"
 
-[[depends-on]]
-# add crates here (e.g. gnatprove is handled via `alr toolchain`, not as a dependency)
+long-description = """
+Host-side reference models, oracles, and risk-analysis tooling for the
+IEC 62304 / IEC 60601-1 / IEC 60601-1-4 / ISO 14971 project. Isolated crate.
+"""

@@ -1,4 +1,4 @@
-project Safety_Controller is
+project Safety_Controller_Ref is
 
    for Source_Dirs use ("include", "source");
    for Object_Dir use "obj";
@@ -13,4 +13,4 @@ project Safety_Controller is
         ("-gnatwa", "-gnata", "-gnat2012");
    end Compiler;
 
-end Safety_Controller;
+end Safety_Controller_Ref;
