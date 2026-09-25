@@ -1,0 +1,42 @@
+# source of truth for requirement -> code -> test traceability;
+# one entry per requirement, across all four standards. `standard` picks which certification bucket it rolls up into; 
+# `module` should match a directory name under src/device/ or ada/src/
+
+# - id: HLR-001
+#   standard: IEC-62304          # IEC-62304 | IEC-60601-1 | IEC-60601-1-4 | ISO-14971
+#   module: example_module
+#   text: "Placeholder requirement text."
+#   code_refs: []                # e.g. ["src/device/example_module/source/example_module.c"]
+#   test_refs: []                # e.g. ["tests/example_module/test_foo.c"]
+#   status: draft                 # draft | implemented | verified
+
+requirements:
+  - id: REQ-SC-001
+    standard: IEC-60601-1
+    module: safety_controller
+    text: >
+      The safety controller shall clamp any commanded insulin dose it
+      receives to no more than [max dose rate -- TBD] before forwarding
+      it to the pump, independent of whether the dosing algorithm's
+      computed value is correct.
+    code_refs:
+      - src/device/safety_controller/source/safety_controller.c
+    test_refs: []
+    status: draft
+    # traces to SR-006 (docs/certifications/IEC-60601-1/safety_requirements/00-safety-requirements.md) and FMEA-004/FMEA-007
+    # (python/data/fmea.yaml); numeric ceiling is the same open TBD carried since the essential performance doc, not invented here, 
+    # still blocked on component/dose-model selection
+
+  - id: REQ-SC-002
+    standard: IEC-60601-1-4
+    module: safety_controller
+    text: >
+      The safety controller shall reject (fail-safe: block the dose,
+      do not pass it through) any dose command received via a corrupted,
+      malformed, or unrecognized message on the main-controller interface.
+    code_refs:
+      - src/device/safety_controller/source/safety_controller.c
+    test_refs: []
+    status: draft
+    # traces to HAZ-012 / FMEA-012; the fail-safe design intent named in the hazard analysis doc as not yet formalized into a
+    # requirement; this is that formalization
