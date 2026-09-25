@@ -1,6 +1,6 @@
 project Safety_Controller_Ref is
 
-   for Source_Dirs use ("include", "source");
+   for Source_Dirs use ("include", "src");
    for Object_Dir use "obj";
 
    package Naming is

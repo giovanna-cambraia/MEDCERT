@@ -1,0 +1,26 @@
+# Alire / GPRbuild generated directories
+/alire/
+/config/
+obj/
+lib/
+bin/
+
+# GNAT build artifacts
+*.o
+*.ali
+*.bexch
+
+# Binder-generated files (GNAT creates these for main subprograms)
+b~*.adb
+b~*.ads
+
+# GPRbuild project file cache / intermediate
+*.cgpr
+*.db
+*.db-??
+
+# Editor / OS noise
+*~
+*.swp
+*.swo
+.DS_Store

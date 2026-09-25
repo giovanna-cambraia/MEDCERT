@@ -1,7 +1,7 @@
 aggregate project Medcert_Oracles is
 
    for Project_Files use
-     ("src/safety_controller_ref/safety_controller.gpr");
+     ("src/safety_controller_ref/safety_controller_ref.gpr");
      -- add one line per new host-side module (reference model, oracle, risk-analysis tool, SPARK-proved logic);
      -- every module gets its owm .gpr so it can be built/tested in isolation before wiring in here
 
