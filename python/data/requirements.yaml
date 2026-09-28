@@ -20,12 +20,17 @@ requirements:
       it to the pump, independent of whether the dosing algorithm's
       computed value is correct.
     code_refs:
-      - src/device/safety_controller/source/safety_controller.c
-    test_refs: []
-    status: draft
-    # traces to SR-006 (docs/certifications/IEC-60601-1/safety_requirements/00-safety-requirements.md) and FMEA-004/FMEA-007
-    # (python/data/fmea.yaml); numeric ceiling is the same open TBD carried since the essential performance doc, not invented here, 
-    # still blocked on component/dose-model selection
+      - src/device/safety_controller/src/safety_controller.c
+      - src/device/safety_controller/include/safety_controller.h
+      - ada/src/safety_controller_ref/include/safety_controller_ref.ads
+      - ada/src/safety_controller_ref/src/safety_controller_ref.adb
+      - ada/src/safety_controller_ref/include/safety_controller_ref_demo.ads
+    test_refs:
+      - ada/src/safety_controller_ref/src/verify_oracle.adb
+      - src/device/safety_controller/tests/test_safety_controller.c
+    status: implemented
+    # traces to SR-006 and FMEA-004/FMEA-007; Ada side: gnatprove --mode=prove, 4/4 checks; C side: test_safety_controller passes;
+    # both use the arbitrary placeholder ceiling 100, not the real one; moves to verified once the real ceiling replaces the placeholder and both are re-run against it
 
   - id: REQ-SC-002
     standard: IEC-60601-1-4
@@ -35,8 +40,14 @@ requirements:
       do not pass it through) any dose command received via a corrupted,
       malformed, or unrecognized message on the main-controller interface.
     code_refs:
-      - src/device/safety_controller/source/safety_controller.c
-    test_refs: []
-    status: draft
-    # traces to HAZ-012 / FMEA-012; the fail-safe design intent named in the hazard analysis doc as not yet formalized into a
-    # requirement; this is that formalization
+      - src/device/safety_controller/src/safety_controller.c
+      - src/device/safety_controller/include/safety_controller.h
+      - ada/src/safety_controller_ref/include/safety_controller_ref.ads
+      - ada/src/safety_controller_ref/src/safety_controller_ref.adb
+      - ada/src/safety_controller_ref/include/safety_controller_ref_demo.ads
+    test_refs:
+      - ada/src/safety_controller_ref/src/verify_oracle.adb
+      - src/device/safety_controller/tests/test_safety_controller.c
+    status: implemented
+    # traces to HAZ-012 / FMEA-012. Same evidence as REQ-SC-001; the C test also covers a corrupted enum value (99), a case the Ada type
+    # cannot represent
