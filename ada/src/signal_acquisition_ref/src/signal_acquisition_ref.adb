@@ -25,14 +25,17 @@ is
          end if;
    end Classify;
 
-   function Process (S : Acq_State; Reading : Glucose_Units; Now : Tick_Count)
-         return Output
-      is 
+   function Process
+      (S       : Acq_State;
+         Reading : Glucose_Units;
+         Now     : Tick_Count) return Output
+      is
+         Status : constant Reading_Status := Classify (S, Reading, Now);
       begin
-         if Classify (S, Reading, Now) = Valid then
-            return (Present => True, Value => 0);
+         if Status = Valid then
+            return Output'(Present => True, Value => Reading);
          else
-            return (Present => False, Value => 0);
+            return Output'(Present => False);
          end if;
    end Process;
 

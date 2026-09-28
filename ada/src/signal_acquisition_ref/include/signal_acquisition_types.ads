@@ -9,7 +9,7 @@ package Signal_Acquisition_Types is
    -- status classifies one that arrived 
    type Reading_Status is (Valid, Out_Of_Range, Implausible_Rate);
 
-   type Output (Present : Boolean := False) is record
+  type Output (Present : Boolean := False) is record
       case Present is
          when True =>
             Value : Glucose_Units;
@@ -17,5 +17,4 @@ package Signal_Acquisition_Types is
             null;
       end case;
    end record;
-
 end Signal_Acquisition_Types;
