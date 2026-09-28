@@ -51,3 +51,43 @@ requirements:
     status: implemented
     # traces to HAZ-012 / FMEA-012. Same evidence as REQ-SC-001; the C test also covers a corrupted enum value (99), a case the Ada type
     # cannot represent
+
+      - id: REQ-SA-001
+    standard: IEC-60601-1
+    module: signal_acquisition
+    text: >
+      The device shall treat the CGM signal as lost if no valid reading
+      has been received within [dropout timeout -- TBD], and shall then
+      pass no glucose value to the dosing algorithm and shall raise a
+      signal-loss indication, rather than reuse the last known reading.
+    code_refs: []
+    test_refs: []
+    status: draft
+    # traces to SR-001, EP-002, HAZ-002, FMEA-002; the timeout is a build-time parameter that must be supplied, never defaulted 
+    # (blocked on CGM selection, same pattern as the dose ceiling)
+
+  - id: REQ-SA-002
+    standard: IEC-60601-1
+    module: signal_acquisition
+    text: >
+      The device shall reject any glucose reading outside
+      [plausible range min -- TBD] to [plausible range max -- TBD] and
+      shall not pass it to the dosing algorithm.
+    code_refs: []
+    test_refs: []
+    status: draft
+    # traces to SR-002, EP-001, HAZ-001, HAZ-003, FMEA-003; range bounds depend on the CGM's specified measurement range
+
+  - id: REQ-SA-003
+    standard: IEC-60601-1
+    module: signal_acquisition
+    text: >
+      The device shall reject any glucose reading whose change from the
+      previous accepted reading exceeds [max physiological rate of
+      change -- TBD] over the elapsed time, and shall not pass it to the
+      dosing algorithm.
+    code_refs: []
+    test_refs: []
+    status: draft
+    # traces to SR-002, HAZ-003, FMEA-003 (transient spikes / EMI); new requirement: SR-002 only said "physiologically plausible", and
+    # a spike inside the valid range needs a rate check to be caught

@@ -109,6 +109,26 @@ Now that Option A is chosen:
   "chosen architecture" isn't "built and verified."
 These are separate files/edits, not made in this one.
 
+## Safe state
+
+The safe state is entered when the main controller has no trustworthy
+glucose value (signal dropout, implausible readings) or when a fault is
+detected:
+
+1. Automated dosing is suspended: the dosing algorithm issues no dose
+   commands, and the safety controller forwards none.
+2. A signal-loss / fault alarm is raised (independent path, see SR-009).
+3. Control returns to the patient (manual dosing).
+
+The safe state ends only when valid readings have resumed for
+[recovery period — TBD]. A single good reading does not end it.
+
+Open: suspending insulin entirely is not risk-free. Prolonged
+suspension leads to hyperglycemia/DKA (same harm as HAZ-008). Whether
+the safe state delivers a fixed pre-programmed basal rate instead of
+zero, and how the alarm escalates the longer the suspension lasts, are
+clinical decisions that are still TBD. Neither is decided here.
+
 ## Interfaces (preliminary, both options)
 
 | Interface | Direction | Carries | Notes |

@@ -17,8 +17,9 @@ safety requirement covers part of an EP item or spans several).
 ## Signal acquisition / monitor
 
 - **SR-001** — The device shall detect loss of CGM signal within
-  [dropout detection time — TBD] and transition to a defined safe state
-  rather than dosing on a stale reading. (← EP-002, HAZ-002)
+  [dropout detection time — TBD] and transition to the **safe state**
+  (defined in the PEMS architecture doc) rather than dosing on a stale
+  reading. (← EP-002, HAZ-002)
 - **SR-002** — The device shall reject or flag glucose readings outside
   a physiologically plausible range rather than acting on them as valid.
   (← EP-001, HAZ-001, HAZ-003)
