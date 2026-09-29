@@ -1,7 +1,8 @@
 aggregate project Device is
 
    for Project_Files use
-     ("../src/device/safety_controller/safety_controller.gpr");
+      ("device/safety_controller/safety_controller.gpr",
+      "device/signal_acquisition/signal_acquisition.gpr");
    -- Add one line per new device module.
 
 end Device;
