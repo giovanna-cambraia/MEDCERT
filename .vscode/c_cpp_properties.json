@@ -10,6 +10,22 @@
         "SC_MAX_DOSE_PER_CYCLE=100u"
       ],
       "cStandard": "c11"
+    },
+    {
+      "name": "MEDCERT",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "${workspaceFolder}/src/device/safety_controller/include",
+        "${workspaceFolder}/src/device/signal_acquisition/include"
+      ],
+      "defines": [
+        "SC_MAX_DOSE_PER_CYCLE=100u",
+        "SA_DROPOUT_TIMEOUT=100u",
+        "SA_PLAUSIBLE_MIN=20u",
+        "SA_PLAUSIBLE_MAX=500u",
+        "SA_MAX_DELTA_PER_TICK=2u"
+      ],
+      "cStandard": "c11"
     }
   ]
 }
