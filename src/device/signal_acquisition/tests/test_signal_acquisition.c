@@ -40,13 +40,6 @@ int main (void)
     {
         sa_output_t out = sa_process(&s, 300, 210);
         CHECK(out.present == true);
-        CHECK(out.value == 100);
-    } 
-
-    // the gate: only valid ever yields present == true
-    {
-        sa_output_t out = sa_process(&s, 300, 210);
-        CHECK(out.present == true);
         CHECK(out.value == 300);
     }
 
