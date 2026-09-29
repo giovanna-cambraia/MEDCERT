@@ -1,0 +1,21 @@
+with "signal_acquisition.gpr";
+
+project Signal_Acquisition_Tests is
+
+   for Languages use ("C");
+   for Source_Dirs use ("../signal_acquisition/tests");
+   for Object_Dir use "tests/obj";
+   for Exec_Dir use "tests/bin";
+   for Main use ("test_signal_acquisition.c");
+
+   package Compiler is
+      for Default_Switches ("C") use
+        ("-Wall", "-Wextra", "-std=c11", "-pedantic",
+         "-DSA_DROPOUT_TIMEOUT=100u",
+         "-DSA_PLAUSIBLE_MIN=20u",
+         "-DSA_PLAUSIBLE_MAX=500u",
+         "-DSA_MAX_DELTA_PER_TICK=2u",
+         "-I" & Signal_Acquisition.Include_Dir);
+   end Compiler;
+
+end Signal_Acquisition_Tests;
