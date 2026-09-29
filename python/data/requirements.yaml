@@ -1,5 +1,5 @@
 # source of truth for requirement -> code -> test traceability;
-# one entry per requirement, across all four standards. `standard` picks which certification bucket it rolls up into; 
+# one entry per requirement, across all four standards. `standard` picks which certification bucket it rolls up into;
 # `module` should match a directory name under src/device/ or ada/src/
 
 # - id: HLR-001
@@ -29,8 +29,9 @@ requirements:
       - ada/src/safety_controller_ref/src/verify_oracle.adb
       - src/device/safety_controller/tests/test_safety_controller.c
     status: implemented
-    # traces to SR-006 and FMEA-004/FMEA-007; Ada side: gnatprove --mode=prove, 4/4 checks; C side: test_safety_controller passes;
-    # both use the arbitrary placeholder ceiling 100, not the real one; moves to verified once the real ceiling replaces the placeholder and both are re-run against it
+    # traces to SR-006 and FMEA-004/FMEA-007. Ada side: gnatprove --mode=prove, 4/4 checks. C side: test_safety_controller passes;
+    # both use the arbitrary placeholder ceiling 100, not the real one; moves to verified once the real ceiling replaces the placeholder
+    # and both are re-run against it
 
   - id: REQ-SC-002
     standard: IEC-60601-1-4
@@ -52,7 +53,7 @@ requirements:
     # traces to HAZ-012 / FMEA-012. Same evidence as REQ-SC-001; the C test also covers a corrupted enum value (99), a case the Ada type
     # cannot represent
 
-      - id: REQ-SA-001
+  - id: REQ-SA-001
     standard: IEC-60601-1
     module: signal_acquisition
     text: >
@@ -60,11 +61,18 @@ requirements:
       has been received within [dropout timeout -- TBD], and shall then
       pass no glucose value to the dosing algorithm and shall raise a
       signal-loss indication, rather than reuse the last known reading.
-    code_refs: []
-    test_refs: []
-    status: draft
-    # traces to SR-001, EP-002, HAZ-002, FMEA-002; the timeout is a build-time parameter that must be supplied, never defaulted 
-    # (blocked on CGM selection, same pattern as the dose ceiling)
+    code_refs:
+      - src/device/signal_acquisition/src/signal_acquisition.c
+      - src/device/signal_acquisition/include/signal_acquisition.h
+      - ada/src/signal_acquisition_ref/include/signal_acquisition_ref.ads
+      - ada/src/signal_acquisition_ref/src/signal_acquisition_ref.adb
+      - ada/src/signal_acquisition_ref/include/signal_acquisition_ref_demo.ads
+    test_refs:
+      - ada/src/signal_acquisition_ref/src/verify_sa_oracle.adb
+      - src/device/signal_acquisition/tests/test_signal_acquisition.c
+    status: implemented
+    # traces to SR-001, EP-002, HAZ-002, FMEA-002; Ada side: gnatprove --mode=prove clean. C side: test_signal_acquisition passes;
+    # both use placeholder values, not the real dropout timeout
 
   - id: REQ-SA-002
     standard: IEC-60601-1
@@ -73,10 +81,18 @@ requirements:
       The device shall reject any glucose reading outside
       [plausible range min -- TBD] to [plausible range max -- TBD] and
       shall not pass it to the dosing algorithm.
-    code_refs: []
-    test_refs: []
-    status: draft
-    # traces to SR-002, EP-001, HAZ-001, HAZ-003, FMEA-003; range bounds depend on the CGM's specified measurement range
+    code_refs:
+      - src/device/signal_acquisition/src/signal_acquisition.c
+      - src/device/signal_acquisition/include/signal_acquisition.h
+      - ada/src/signal_acquisition_ref/include/signal_acquisition_ref.ads
+      - ada/src/signal_acquisition_ref/src/signal_acquisition_ref.adb
+      - ada/src/signal_acquisition_ref/include/signal_acquisition_ref_demo.ads
+    test_refs:
+      - ada/src/signal_acquisition_ref/src/verify_sa_oracle.adb
+      - src/device/signal_acquisition/tests/test_signal_acquisition.c
+    status: implemented
+    # traces to SR-002, EP-001, HAZ-001, HAZ-003, FMEA-003; same evidence as REQ-SA-001; Out-of-range check takes priority over the rate
+    # check when both would fire (tested explicitly)
 
   - id: REQ-SA-003
     standard: IEC-60601-1
@@ -86,8 +102,15 @@ requirements:
       previous accepted reading exceeds [max physiological rate of
       change -- TBD] over the elapsed time, and shall not pass it to the
       dosing algorithm.
-    code_refs: []
-    test_refs: []
-    status: draft
-    # traces to SR-002, HAZ-003, FMEA-003 (transient spikes / EMI); new requirement: SR-002 only said "physiologically plausible", and
-    # a spike inside the valid range needs a rate check to be caught
+    code_refs:
+      - src/device/signal_acquisition/src/signal_acquisition.c
+      - src/device/signal_acquisition/include/signal_acquisition.h
+      - ada/src/signal_acquisition_ref/include/signal_acquisition_ref.ads
+      - ada/src/signal_acquisition_ref/src/signal_acquisition_ref.adb
+      - ada/src/signal_acquisition_ref/include/signal_acquisition_ref_demo.ads
+    test_refs:
+      - ada/src/signal_acquisition_ref/src/verify_sa_oracle.adb
+      - src/device/signal_acquisition/tests/test_signal_acquisition.c
+    status: implemented
+    # traces to SR-002, HAZ-003, FMEA-003. Same evidence as REQ-SA-001; rate check is skipped once a dropout has occurred (tested
+    # explicitly), since there's nothing valid left to compare against
