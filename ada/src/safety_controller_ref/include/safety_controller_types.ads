@@ -6,7 +6,7 @@ package Safety_Controller_Types is
    -- now and re-scaled later without touching the proof
    type Dose_Units is range 0 .. 1_000_000;
 
-   -- REQ-SC-002: only a Valid command may result in a dose forwarded; every other status is a rejection, not a degraded pass-through 
+   -- REQ-SC-002: only a Valid command may result in a dose forwarded; every other status is a rejection, not a degraded pass-through
    -- this is the fail-safe direction named in HAZ-012 / FMEA-012
    type Command_Status is (Valid, Malformed, Stale, Unrecognized);
 
