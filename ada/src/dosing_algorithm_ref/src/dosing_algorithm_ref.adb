@@ -2,18 +2,6 @@ package body Dosing_Algorithm_Ref
    with SPARK_Mode => On  
 is
 
-   function Clamp_LLI (Value, Lo, Hi : Long_Long_Integer)
-         return Long_Long_Integer is
-      begin
-         if Value < Lo then
-            return Lo;
-         elsif Value > Hi then
-            return Hi;
-         else
-            return Value;
-         end if;
-   end Clamp_LLI;
-
    function Compute (S : Algo_State; Reading : Glucose_Units; Now : Tick_Count)
       return Output
    is
