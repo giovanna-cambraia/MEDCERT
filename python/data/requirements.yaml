@@ -114,3 +114,56 @@ requirements:
     status: implemented
     # traces to SR-002, HAZ-003, FMEA-003. Same evidence as REQ-SA-001; rate check is skipped once a dropout has occurred (tested
     # explicitly), since there's nothing valid left to compare against
+
+      - id: REQ-DA-001
+    standard: IEC-62304
+    module: dosing_algorithm
+    text: >
+      The dosing algorithm shall compute a dose only from the current
+      validated glucose reading and a bounded recent history; it shall
+      not dose on data older than [staleness bound -- TBD].
+    code_refs: []
+    test_refs: []
+    status: draft
+    # traces to SR-003, HAZ-004, HAZ-006, FMEA-004, FMEA-006
+
+  - id: REQ-DA-002
+    standard: IEC-62304
+    module: dosing_algorithm
+    text: >
+      The dosing algorithm shall include a self-check (plausibility
+      bound on its own output and a state-integrity check) before
+      emitting a dose command, and shall fail to a no-dose / alarm
+      state rather than emit an unchecked value.
+    code_refs: []
+    test_refs: []
+    status: draft
+    # traces to SR-004, HAZ-006, FMEA-006
+
+  - id: REQ-DA-003
+    standard: IEC-62304
+    module: dosing_algorithm
+    text: >
+      The dosing algorithm shall re-evaluate its computed dose against
+      the most recent glucose trend at a bounded cycle time
+      [cycle time -- TBD], so that a rapidly changing glucose level is
+      corrected within a bounded delay.
+    code_refs: []
+    test_refs: []
+    status: draft
+    # traces to SR-005, HAZ-005, FMEA-005
+
+  - id: REQ-DA-004
+    standard: IEC-60601-1-4
+    module: dosing_algorithm
+    text: >
+      The dosing algorithm shall have no interface capable of
+      commanding the pump directly; every computed dose shall be sent
+      only to the safety controller interface.
+    code_refs: []
+    test_refs: []
+    status: draft
+    # this is the structural enforcement of the architecture decision ust confirmed (ALGO -> LIMIT -> PUMP, no direct ALGO -> PUMP
+    # path); without this requirement, REQ-SC-001's clamp guarantee is only a diagram convention, not something that's actually checked;
+    # new requirement, not previously named in the safety requirements doc -- worth adding there too once dosing_algorithm's interface
+    # is designed
